@@ -16,6 +16,7 @@ public class Main {
         Escribe 'exit' para salir.
         """;
 
+    //La función de que la calculadora acepte números negativos explícitos ya está implementanda de serie.
     public static void main(String[] args) {
         System.out.println(HELP);
         Scanner sc = new Scanner(System.in);
