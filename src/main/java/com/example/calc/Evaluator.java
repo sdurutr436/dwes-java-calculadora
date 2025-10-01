@@ -1,12 +1,19 @@
 package com.example.calc;
 
-import static com.example.calc.Expr.*;
+import com.example.calc.Expr.Binary;
+import com.example.calc.Expr.Call;
+import com.example.calc.Expr.NumberLit;
+import com.example.calc.Expr.Unary;
 
 public final class Evaluator {
     private Evaluator() { throw new AssertionError("No instanciable"); }
 
     public static double eval(Expr e) {
         return switch (e) {
+
+            // Caso para manejar el resultado previo
+            case Expr.Ans a -> throw new IllegalArgumentException("No hay valor previo");
+            
             case NumberLit n -> n.value();
             case Unary u -> {
                 double v = eval(u.expr());
