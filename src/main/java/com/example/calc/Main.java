@@ -32,8 +32,6 @@ public class Main {
                 List<Token> tokens = new Lexer(line).lex();
                 Expr ast = new Parser(tokens).parse();
                 double result = Evaluator.eval(ast);
-                double ans = result; // Guardar el resultado en 'ans'
-                Expr ansExpr = new Expr.Ans(); // Crear una expresión Ans
                 System.out.println(result);
             } catch (IllegalArgumentException ex) {
                 System.out.println("Error: " + ex.getMessage());

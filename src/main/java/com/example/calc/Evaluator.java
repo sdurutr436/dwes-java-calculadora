@@ -12,8 +12,6 @@ public final class Evaluator {
     public static double eval(Expr e) {
         double result = switch (e) {
 
-            // Caso para manejar el resultado previo. Ans en este momento, tiene valor
-
             case NumberLit n -> n.value();
             case Unary u -> {
                 double v = eval(u.expr());
