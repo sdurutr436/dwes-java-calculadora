@@ -2,8 +2,21 @@ package com.example.calc;
 
 import java.util.List;
 
-import static com.example.calc.TokenType.*;
-import static com.example.calc.Expr.*;
+import com.example.calc.Expr.Ans;
+import com.example.calc.Expr.Binary;
+import com.example.calc.Expr.Call;
+import com.example.calc.Expr.NumberLit;
+import com.example.calc.Expr.Unary;
+import static com.example.calc.TokenType.CARET;
+import static com.example.calc.TokenType.EOF;
+import static com.example.calc.TokenType.IDENT;
+import static com.example.calc.TokenType.LPAREN;
+import static com.example.calc.TokenType.MINUS;
+import static com.example.calc.TokenType.NUMBER;
+import static com.example.calc.TokenType.PLUS;
+import static com.example.calc.TokenType.RPAREN;
+import static com.example.calc.TokenType.SLASH;
+import static com.example.calc.TokenType.STAR;
 
 public final class Parser {
     private final List<Token> ts;
@@ -61,6 +74,9 @@ public final class Parser {
         if (match(NUMBER)) return new NumberLit(Double.parseDouble(prev().lexeme()));
         if (match(IDENT)) {
             String name = prev().lexeme();
+            if (name.equalsIgnoreCase("ans")) {
+                return new Ans(); // caso especial para "Ans"
+            }
             expect(LPAREN, "Se esperaba '(' tras función");
             Expr arg = expr();
             expect(RPAREN, "Se esperaba ')' tras argumento");
@@ -73,6 +89,7 @@ public final class Parser {
         }
         throw error("Token inesperado: " + peek().type() + " en pos " + peek().position());
     }
+
 
     private boolean match(TokenType t) { if (check(t)) { i++; return true; } return false; }
     private boolean check(TokenType t) { return peek().type() == t; }

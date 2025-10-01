@@ -7,13 +7,13 @@ import com.example.calc.Expr.Unary;
 
 public final class Evaluator {
     private Evaluator() { throw new AssertionError("No instanciable"); }
+    private static double lastResult = 0.0;
 
     public static double eval(Expr e) {
-        return switch (e) {
+        double result = switch (e) {
 
-            // Caso para manejar el resultado previo
-            case Expr.Ans a -> throw new IllegalArgumentException("No hay valor previo");
-            
+            // Caso para manejar el resultado previo. Ans en este momento, tiene valor
+
             case NumberLit n -> n.value();
             case Unary u -> {
                 double v = eval(u.expr());
@@ -41,6 +41,10 @@ public final class Evaluator {
                     default -> throw new IllegalArgumentException("Función no soportada: " + c.name());
                 };
             }
+            case Expr.Ans a -> lastResult; // Devolver el último resultado almacenado
         };
+        
+        lastResult = result;
+        return result;
     }
 }
