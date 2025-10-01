@@ -280,3 +280,62 @@ La calculadora respeta la precedencia y los paréntesis:
 
 ---
 
+
+# 📘 Retos adicionales – Diseño de Calc21
+
+Este documento responde a nuevas preguntas sobre las decisiones de diseño en la implementación de la calculadora **Calc21**.  
+
+---
+
+## 🔹 1. Ventaja de usar un parser recursivo frente a bucle + pila manual
+
+El **parser recursivo** tiene varias ventajas:  
+
+- El código es **más simple y legible**, ya que las llamadas recursivas reflejan directamente la estructura de la gramática (ejemplo: `expr → term → factor → primary`).  
+- Maneja de forma **natural** la precedencia y la asociatividad de los operadores (por ejemplo, la potencia `^` con asociatividad a la derecha).  
+- Facilita la extensión de la gramática, añadiendo nuevas reglas con funciones adicionales.  
+
+Con un bucle y pila manual, habría que implementar toda la lógica de precedencia y asociaciones manualmente, lo que vuelve el código más largo, más propenso a errores y menos intuitivo.  
+
+---
+
+## 🔹 2. ¿Por qué separar en fases lexer → parser → evaluator?
+
+Separar en fases ofrece varias ventajas:  
+
+- **Claridad y modularidad**: cada fase tiene una única responsabilidad (lexer convierte texto en tokens, parser tokens en AST, evaluator AST en resultado).  
+- **Reutilización**: se puede usar el mismo lexer/parser con diferentes evaluadores (por ejemplo, para imprimir, optimizar, o compilar la expresión).  
+- **Depuración**: es más fácil identificar errores (ejemplo: ¿el problema está en el análisis léxico, en la sintaxis o en la evaluación?).  
+- **Extensibilidad**: se pueden añadir nuevas operaciones o funciones sin modificar todo el sistema.  
+
+Si todo se hiciera en un solo método, el código sería **complejo, difícil de leer, de depurar y de mantener**.  
+
+---
+
+## 🔹 3. ¿Dónde añadir soporte para variables (`x = 5`, `y = 2 * x`)?
+
+Para añadir variables, habría que extender el sistema en **dos partes** principales:  
+
+1. **En el parser**  
+   - Detectar una asignación con el operador `=` (por ejemplo, `IDENT '=' expr`).  
+   - Representarla en el AST con un nuevo tipo de nodo, por ejemplo:  
+     ```java
+     record Assign(String name, Expr value) implements Expr {}
+     ```  
+
+2. **En el evaluator**  
+   - Mantener un **entorno de variables** (un `Map<String, Double>`).  
+   - Cuando se evalúe una `Assign`, guardar el valor en el mapa.  
+   - Cuando se evalúe un `Call` o un `Variable`, buscar el valor en el mapa.  
+   - Ejemplo de nuevo nodo:  
+     ```java
+     record Variable(String name) implements Expr {}
+     ```  
+
+📌 Así, la lógica de variables queda separada y consistente:  
+- El **lexer** no necesita cambiar (ya reconoce `IDENT`).  
+- El **parser** entiende la sintaxis `x = ...`.  
+- El **evaluator** gestiona el almacenamiento y recuperación de valores.  
+
+---
+
