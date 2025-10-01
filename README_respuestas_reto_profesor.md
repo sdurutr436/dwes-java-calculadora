@@ -224,3 +224,59 @@ Binary(
 - La calculadora respeta **precedencia de operadores** y **paréntesis**.
 - Las expresiones no válidas generan errores claros sin bloquear el programa.
 - Funciones (`sin`, `cos`) y operadores básicos (`+ - * / ^`) se evaluan correctamente.
+
+# 📘 Retos adicionales – Evaluación de expresiones en Calc21
+
+Este documento responde a las nuevas preguntas sobre la evaluación de expresiones usando el proyecto **Calc21**.  
+
+---
+
+## 🔹 1. ¿Qué resultado debería devolver la expresión `cos(0) + sin(90)`?
+
+**Importante**: las funciones trigonométricas en Java (`Math.sin`, `Math.cos`) esperan **radianes**, no grados.  
+
+- `cos(0)` = `1.0`  
+- `sin(90)` → aquí 90 está en **radianes**, no en grados.  
+  - En radianes, `sin(90)` ≈ `0.8939966636`  
+  - (porque 90 radianes = 90 × 180/π ≈ 5157 grados).  
+
+📌 Entonces:  
+```
+cos(0) + sin(90) ≈ 1.0 + 0.8939966636 = 1.8939966636
+```  
+
+Si se esperaran grados, habría que convertir (90° = π/2 rad), pero **el código no hace la conversión**.  
+
+---
+
+## 🔹 2. ¿Cuál es el resultado de `2 ^ 3 ^ 2`?
+
+El parser implementa la potencia (`^`) con **asociatividad a la derecha** (gracias a la recursión en la función `power()`).  
+
+Esto significa que la expresión se interpreta como:  
+
+```
+2 ^ (3 ^ 2)
+```
+
+- `3 ^ 2 = 9`  
+- `2 ^ 9 = 512`  
+
+✅ Resultado: **512**.  
+
+Si fuera asociatividad a la izquierda, se calcularía `(2 ^ 3) ^ 2 = 8 ^ 2 = 64`, pero el código no lo hace así.  
+
+---
+
+## 🔹 3. ¿Qué devuelve la calculadora con `(2 + 3) * (4 + 5)`?
+
+La calculadora respeta la precedencia y los paréntesis:  
+
+1. `(2 + 3)` = `5`  
+2. `(4 + 5)` = `9`  
+3. `5 * 9 = 45`  
+
+✅ Resultado: **45**.  
+
+---
+
