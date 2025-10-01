@@ -106,3 +106,121 @@ Las funciones `expr() → term() → factor() → primary()` se llaman recursiva
 - El parser es **recursivo** porque usa llamadas a sí mismo para manejar expresiones anidadas como potencias y paréntesis.  
 
 ---
+
+# Guía de Ejemplos y Comportamiento de la Calculadora Java
+
+Este documento explica cómo funciona la calculadora de tu proyecto Java con distintos tipos de entradas.
+
+---
+
+## 1. Entrada: `2 + 3 * 4`
+
+**Paso a paso:**
+
+1. **Lexer** convierte la cadena en tokens:
+
+```
+[NUMBER(2), PLUS(+), NUMBER(3), STAR(*), NUMBER(4), EOF]
+```
+
+2. **Parser** construye el AST respetando precedencia (`*` > `+`):
+
+```text
+Binary(
+    left = NumberLit(2),
+    op = '+',
+    right = Binary(
+        left = NumberLit(3),
+        op = '*',
+        right = NumberLit(4)
+    )
+)
+```
+
+3. **Evaluator** evalúa recursivamente:
+
+- Subárbol derecho: `3 * 4 = 12`
+- Árbol principal: `2 + 12 = 14`
+
+**Resultado:**  
+
+```
+14.0
+```
+
+> La calculadora respeta la precedencia estándar de operadores.
+
+---
+
+## 2. Entrada no válida: `2 + *`
+
+**Qué ocurre:**
+
+1. Lexer produce tokens:
+
+```
+[NUMBER(2), PLUS(+), STAR(*), EOF]
+```
+
+2. Parser intenta construir `expr()`:
+
+- `expr()` espera un `term()` a la derecha de `+`.
+- `term()` llama a `factor()` → `power()` → `unary()` → `primary()`.
+- En `primary()`, el token `*` **no es un número, paréntesis ni identificador**.
+
+**Resultado:**  
+
+Lanza excepción en `primary()`:
+
+```text
+Error: Token inesperado: STAR en pos 4
+```
+
+> La calculadora no se bloquea, solo informa el error de forma clara.
+
+---
+
+## 3. Entrada: `(2 + 3) ^ 2`
+
+**Paso a paso:**
+
+1. Lexer:
+
+```
+[LPAREN, NUMBER(2), PLUS, NUMBER(3), RPAREN, CARET, NUMBER(2), EOF]
+```
+
+2. Parser construye AST respetando paréntesis y asociatividad a la derecha de `^`:
+
+```text
+Binary(
+    left = Binary(
+        left = NumberLit(2),
+        op = '+',
+        right = NumberLit(3)
+    ),
+    op = '^',
+    right = NumberLit(2)
+)
+```
+
+3. Evaluator:
+
+- Eval del subárbol: `(2 + 3) = 5`
+- Eval del árbol principal: `5 ^ 2 = 25`
+
+**Resultado:**  
+
+```
+25.0
+```
+
+> Los paréntesis se respetan correctamente y la potencia es asociativa a la derecha.
+
+---
+
+## Conclusión
+
+- La calculadora respeta **precedencia de operadores** y **paréntesis**.
+- Las expresiones no válidas generan errores claros sin bloquear el programa.
+- Funciones (`sin`, `cos`) y operadores básicos (`+ - * / ^`) se evaluan correctamente.
